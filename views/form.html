@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/static/form.css">
+</head>
+
+<body>
+    <h1>Register for Webinar</h1>
+    <form id="registration-form" class="styled-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="country">Country:</label>
+        <input type="text" id="country" name="country" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <button type="submit">Get webinar link</button>
+    </form>
+    <!-- Modal Section -->
+    <div id="popup-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <p id="modal-message"></p>
+        </div>
+    </div>
+    <script>
+        document.getElementById('registration-form').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent page reload
+
+            // Collect form data
+            const name = document.getElementById('name').value;
+            const country = document.getElementById('country').value;
+            const email = document.getElementById('email').value;
+
+            // Send POST request to the server
+            fetch('/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, country, email }),
+            })
+                .then(response => response.json()) // Parse JSON response
+                .then(data => {
+                    const modal = document.getElementById('popup-modal');
+                    const message = document.getElementById('modal-message');
+
+                    // Update modal content and display
+                    if (data.status === 'success') {
+                        message.textContent = data.message;
+                        message.style.color = 'green';
+                    } else {
+                        message.textContent = data.message;
+                        message.style.color = 'red';
+                    }
+
+                    modal.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+
+                    const modal = document.getElementById('popup-modal');
+                    const message = document.getElementById('modal-message');
+                    message.textContent = 'An unexpected error occurred.';
+                    message.style.color = 'red';
+                    modal.style.display = 'block';
+                });
+        });
+
+        // Modal close functionality
+        document.querySelector('.close-button').onclick = function () {
+            document.getElementById('popup-modal').style.display = 'none';
+        };
+
+        window.onclick = function (event) {
+            const modal = document.getElementById('popup-modal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+    </script>
+</body>
+
+</html>
