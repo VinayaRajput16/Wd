@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Register for Webinar</title>
     <link rel="stylesheet" href="/static/form.css">
 </head>
 
@@ -20,8 +20,12 @@
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" required>
 
+        <label for="phone">Phone Number:</label>
+        <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required>
+        
         <button type="submit">Get webinar link</button>
     </form>
+
     <!-- Modal Section -->
     <div id="popup-modal" class="modal">
         <div class="modal-content">
@@ -29,6 +33,7 @@
             <p id="modal-message"></p>
         </div>
     </div>
+
     <script>
         document.getElementById('registration-form').addEventListener('submit', function (event) {
             event.preventDefault(); // Prevent page reload
@@ -37,6 +42,7 @@
             const name = document.getElementById('name').value;
             const country = document.getElementById('country').value;
             const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
 
             // Send POST request to the server
             fetch('/submit', {
@@ -44,9 +50,9 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name, country, email }),
+                body: JSON.stringify({ name, country, email, phone }),
             })
-                .then(response => response.json()) // Parse JSON response
+                .then(response => response.json())
                 .then(data => {
                     const modal = document.getElementById('popup-modal');
                     const message = document.getElementById('modal-message');

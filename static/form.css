@@ -33,7 +33,8 @@ h1 {
 
 /* Input styling */
 .styled-form input[type="text"],
-.styled-form input[type="email"] {
+.styled-form input[type="email"],
+.styled-form input[type="tel"]  {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
@@ -91,4 +92,18 @@ h1 {
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
+}
+
+#modal-message {
+    font-weight: 600;
+    font-style: italic;
+}
+
+@media (max-width: 450px){
+    h1{
+        font-size: 1.5rem;
+    }
+    .styled-form{
+        max-width: 80%;
+    }
 }
