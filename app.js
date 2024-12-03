@@ -49,7 +49,7 @@ app.get('/webinar', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'webinar.html'));
 });
 
-app.listen(3000, async () => {
+app.listen(PORT, async () => {
     await connectToDatabase();
     console.log('Server is running on port 3000');
 });
