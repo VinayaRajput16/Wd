@@ -1,85 +1,126 @@
-/* wd/static/react/WebinarPage.js */
 import React, { useState, useEffect } from "react";
 import ReactPlayer from "react-player";
 
+// Hardcoded video URL (for easy future management)
+const VIDEO_URL = "https://videos.pexels.com/video-files/9130156/9130156-uhd_2560_1440_30fps.mp4";
+
 const WebinarPage = () => {
-  const [timeLeft, setTimeLeft] = useState(10);  // Countdown time
-  const [isWebinarActive, setIsWebinarActive] = useState(false);  // Webinar active state
-  const [isJoined, setIsJoined] = useState(false);  // Track user joining
-  const [isBuffering, setIsBuffering] = useState(false); // Buffering state
-  const [videoStarted, setVideoStarted] = useState(false);  // Video start state
-  const [attendeesCount, setAttendeesCount] = useState(0);  // Simulate attendee count
-  
-  // Countdown logic
-  useEffect(() => {
-    if (timeLeft > 0) {
-      const timer = setInterval(() => {
-        setTimeLeft((prevTime) => prevTime - 1); // Decrease time by 1 second
-      }, 1000);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [isWebinarActive, setIsWebinarActive] = useState(false);
+  const [isJoined, setIsJoined] = useState(false);
+  const [isBuffering, setIsBuffering] = useState(false);
+  const [videoStarted, setVideoStarted] = useState(false);
+  const [attendeesCount, setAttendeesCount] = useState(0);
 
-      return () => clearInterval(timer);
-    } else {
-      setIsWebinarActive(true); // Enable "Join Webinar" button once timer ends
+  // Function to calculate the next webinar time (11 AM or 6 PM)
+  const getNextWebinarTime = () => {
+    const now = new Date();
+    let nextWebinarTime;
+
+    const webinarTimes = [11, 18]; // 11 AM and 6 PM in 24-hour format
+
+    // Check if current time is before the first webinar (11 AM)
+    if (now.getHours() < webinarTimes[0]) {
+      nextWebinarTime = new Date(now.setHours(webinarTimes[0], 0, 0, 0)); // Set to 11 AM today
+    } 
+    // Check if current time is between 11 AM and 6 PM
+    else if (now.getHours() < webinarTimes[1]) {
+      nextWebinarTime = new Date(now.setHours(webinarTimes[1], 0, 0, 0)); // Set to 6 PM today
+    } 
+    // If it's after 6 PM, set it for 11 AM the next day
+    else {
+      now.setDate(now.getDate() + 1); // Move to the next day
+      nextWebinarTime = new Date(now.setHours(webinarTimes[0], 0, 0, 0)); // Set to 11 AM tomorrow
     }
-  }, [timeLeft]);
 
-  // Simulate buffering delay before starting video
+    return nextWebinarTime;
+  };
+
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600); // Calculate hours
+    const minutes = Math.floor((seconds % 3600) / 60); // Calculate minutes
+    const remainingSeconds = seconds % 60; // Remaining seconds
+
+    return `${hours}h ${minutes}m ${remainingSeconds}s`; // Format as "Xh Xm Xs"
+  };
+
+  useEffect(() => {
+    const nextWebinarTime = getNextWebinarTime();
+    const timeDifference = nextWebinarTime - new Date();
+  
+    // Set the initial timeLeft
+    setTimeLeft(Math.floor(timeDifference / 1000)); // Convert to seconds
+  
+    const countdownInterval = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        if (prevTime <= 1) {
+          clearInterval(countdownInterval); // Stop the countdown
+          setIsWebinarActive(true); // Activate the webinar
+          return 0; // Ensure timeLeft doesn't go negative
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+  
+    return () => clearInterval(countdownInterval); // Cleanup on unmount
+  }, []);
+  
+
+  const handleJoinClick = () => {
+    setIsJoined(true);
+    setAttendeesCount((prevCount) => prevCount + 1); // Increment attendee count
+  };
+
+  const handleLeaveClick = () => {
+    setIsJoined(false);
+    setAttendeesCount((prevCount) => prevCount - 1); // Decrement attendee count
+    setVideoStarted(false);
+    setIsBuffering(false);
+  };
+
   useEffect(() => {
     if (isJoined && isWebinarActive && !videoStarted) {
       setIsBuffering(true);
-      setTimeout(() => {
+      const bufferTimeout = setTimeout(() => {
         setIsBuffering(false);
-        setVideoStarted(true);  // Start the video after 5 seconds delay
-      }, 5000); // 5 seconds delay to simulate buffering
+        setVideoStarted(true);
+      }, 5000);
+      return () => clearTimeout(bufferTimeout);
     }
   }, [isJoined, isWebinarActive, videoStarted]);
-
-  // Handle user clicking "Join" to start the webinar
-  const handleJoinClick = () => {
-    setIsJoined(true);
-    setAttendeesCount((prevCount) => prevCount + 1); // Simulate attendee joining
-  };
-
-  // Handle user clicking "Leave" to exit webinar
-  const handleLeaveClick = () => {
-    setIsJoined(false);
-    setAttendeesCount((prevCount) => prevCount - 1); // Simulate attendee leaving
-    setVideoStarted(false);  // Stop the video
-    setIsBuffering(false);  // Reset buffering
-    setTimeLeft(10);  // Reset the countdown if they rejoin later
-  };
 
   return (
     <div className="webinar-container">
       <h1 className="title">Live Webinar: Future of Technology</h1>
 
-      {/* Countdown Timer */}
-      <div className="countdown">
-        <p>{timeLeft} seconds until webinar starts!</p>
-      </div>
+      {/* Countdown until the webinar starts */}
+      {!isJoined && (
+        <div className="countdown">
+          <p>{formatTime(timeLeft)} until webinar starts!</p> {/* Format time */}
+        </div>
+      )}
 
-      {/* Show Attendees Count */}
+      {/* Attendee count, displayed after user joins */}
       {isJoined && (
         <div className="attendees-info">
           <p>Currently {attendeesCount} attendee{attendeesCount > 1 ? 's' : ''} watching</p>
         </div>
       )}
 
-      {/* Start Webinar Button */}
+      {/* Join Button */}
       {isWebinarActive && !isJoined && (
         <div className="join-button-container">
           <button
             className="join-button"
             onClick={handleJoinClick}
-            disabled={!isWebinarActive} // Button is disabled until timer ends
+            disabled={!isWebinarActive}
           >
             Join Webinar
           </button>
         </div>
       )}
 
-
-      {/* Buffering State */}
+      {/* Buffering state */}
       {isBuffering && (
         <div className="buffering-overlay">
           <div className="buffering-content">
@@ -89,32 +130,30 @@ const WebinarPage = () => {
         </div>
       )}
 
-      {/* Show Webinar Video */}
+      {/* Video Container */}
       {videoStarted && (
         <div className="video-container">
           <ReactPlayer
-            url="https://videos.pexels.com/video-files/9130156/9130156-uhd_2560_1440_30fps.mp4" // Replace with actual video URL
+            url={VIDEO_URL}
             playing={true}
-            controls={false}  // Hide controls for "live" feel
+            controls={false}
             width="100%"
             height="100%"
           />
         </div>
-      )} 
-      {/* Waiting Room - Pre-stream Screen */}
-      {!videoStarted && !isBuffering && (
+      )}
+
+      {/* Waiting Room Message */}
+      {!videoStarted && !isBuffering && !isJoined && (
         <div className="waiting-room">
           <p>The webinar will start shortly. Please stand by...</p>
         </div>
       )}
 
-       {/* Leave Webinar Button */}
-       {isJoined && (
+      {/* Leave Button */}
+      {isJoined && (
         <div className="leave-button-container">
-          <button
-            className="leave-button"
-            onClick={handleLeaveClick}
-          >
+          <button className="leave-button" onClick={handleLeaveClick}>
             Leave Webinar
           </button>
         </div>
