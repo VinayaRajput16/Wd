@@ -119,6 +119,46 @@
     margin-top: 40px;
    
   }
+  /* Rotate Suggestion Overlay */
+.rotate-overlay {
+  display: none; /* Initially hidden */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+}
+
+.rotate-overlay.visible {
+  display: flex; /* Show when needed */
+}
+
+.rotate-message {
+  font-size: 1.5rem;
+  margin-top: 20px;
+}
+
+.rotate-icon {
+  width: 100px;
+  height: 100px;
+  margin-top: 20px;
+  animation: rotate-icon 2s infinite linear;
+}
+
+@keyframes rotate-icon {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
   @media only screen and (max-width: 800px) {
     h1.title{
@@ -129,8 +169,55 @@
       font-size: 1.5rem;
       margin-top: 5px;
       color: #f6a800;
+    }
+    .leave-button {
+      padding: 10px 15px;
+    }
   }
-  .leave-button {
-    padding: 10px 15px;
+
+  @media only screen and (max-width: 650px){
+    h1.title{
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+    p{
+      margin: 10px;
+    }
+    .rotate-message {
+      font-size: 1rem;
+    }
+    .rotate-icon {
+      width: 40px;
+      height: 40px;
   }
+  }
+  @media only screen and (max-width: 450px){
+    .leave-button {
+      padding: 6px 10px;
+      font-size: 1rem;
+  }
+  }
+  @media only screen and (max-width: 350px){
+    h1.title {
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+    }
+    .countdown p {
+      font-size: 1rem;
+      margin-top: 5px;
+    }
+    p{
+      font-size: 0.8rem;
+    }
+    .join-button,.leave-button {
+      padding: 6px 10px;
+      font-size: 1rem;
+      margin-bottom: 15px;
+    } 
+    .attendees-info {
+      font-size: 1.2rem;
+      color: #fff;
+      margin-top: 1px;
+  }
+
   }

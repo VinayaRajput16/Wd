@@ -1,10 +1,8 @@
-//wd/static/react/index.js
-
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client'; // Use createRoot instead of ReactDOM.render
 import WebinarPage from './WebinarPage';
 
-ReactDOM.render(
-  <WebinarPage />,
-  document.getElementById('webinar-root')
-);
+const container = document.getElementById('webinar-root'); // Reference the root DOM element
+const root = createRoot(container); // Create the root
+root.render(<WebinarPage />); // Render the app
+
