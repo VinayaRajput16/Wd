@@ -33,31 +33,44 @@ app.post('/submit', async (req, res) => {
     const { name, country, email, phone } = req.body;
     const { webinarDate, webinarTime } = getWebinarTimeAndDate();
 
+    let isUserNew = false;
+
     try {
-        // Attempt to save user to MongoDB
-        const newUser = new User({ name, country, email, phone });
-        await newUser.save();
+        // Check if the user already exists
+        const existingUser = await User.findOne({ email });
+
+        if (!existingUser) {
+            // User doesn't exist, save them to the database
+            const newUser = new User({ name, country, email, phone });
+            await newUser.save();
+            isUserNew = true;
+        }
     } catch (error) {
-        console.error('MongoDB Error:', error);
-        // Handle MongoDB connection failure gracefully, but continue with email sending
+        console.error('Database Error:', error);
+        // Do not block email sending even if database check/save fails
     }
 
     try {
-        // Send the email even if MongoDB saving fails
+        // Send webinar email regardless of database operation success
         await sendWebinarEmail({ name, email, webinarDate, webinarTime });
+
+        const message = isUserNew
+            ? 'Registration successful! The webinar link has been sent to your email.'
+            : 'Welcome back! The webinar link has been sent to your email.';
 
         res.status(200).json({
             status: 'success',
-            message: 'Registration successful! The webinar link has been sent to your email.',
+            message,
         });
     } catch (error) {
-        console.error('Error sending email:', error);
+        console.error('Email Sending Error:', error);
         res.status(500).json({
             status: 'error',
-            message: 'Error processing your request, but we’ve registered your details.',
+            message: 'Error sending webinar email, but we’ve processed your request.',
         });
     }
 });
+
 
 
 app.get('/webinar', (req, res) => {
