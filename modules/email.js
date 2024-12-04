@@ -16,7 +16,7 @@ async function sendWebinarEmail({ name, email, webinarDate, webinarTime }) {
         html: `Hello ${name},<br><br>
         Thank you for registering for our upcoming webinar! We're excited to have you join us.<br><br>
         Your personalized webinar link is: 
-        <a href="http://localhost:3000/webinar" target="_blank" style="color: #2986cc; text-decoration: underline;">Join the Webinar here</a><br><br>
+        <a href="http://62.72.13.87:3000/webinar" target="_blank" style="color: #2986cc; text-decoration: underline;">Join the Webinar here</a><br><br>
         Date: ${webinarDate}<br>
         Time: ${webinarTime}<br><br>
         Best regards,<br>
