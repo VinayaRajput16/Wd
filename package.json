@@ -1,9 +1,6 @@
 {
   "scripts": {
-    "start": "node app.js",
-    "build": "webpack --config webpack.config.js", 
-    "dev": "webpack-dev-server --config webpack.config.js --mode development", 
-    "server": "nodemon app.js"
+    "start": "node app.js"
   },
   "dependencies": {
     "@babel/core": "^7.26.0",
