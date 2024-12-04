@@ -1,3 +1,4 @@
+//app.js
 require('dotenv').config(); // Load environment variables
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -33,9 +34,16 @@ app.post('/submit', async (req, res) => {
     const { webinarDate, webinarTime } = getWebinarTimeAndDate();
 
     try {
+        // Attempt to save user to MongoDB
         const newUser = new User({ name, country, email, phone });
         await newUser.save();
+    } catch (error) {
+        console.error('MongoDB Error:', error);
+        // Handle MongoDB connection failure gracefully, but continue with email sending
+    }
 
+    try {
+        // Send the email even if MongoDB saving fails
         await sendWebinarEmail({ name, email, webinarDate, webinarTime });
 
         res.status(200).json({
@@ -43,13 +51,14 @@ app.post('/submit', async (req, res) => {
             message: 'Registration successful! The webinar link has been sent to your email.',
         });
     } catch (error) {
-        console.error(error);
+        console.error('Error sending email:', error);
         res.status(500).json({
             status: 'error',
-            message: 'Error processing your request.',
+            message: 'Error processing your request, but we’ve registered your details.',
         });
     }
 });
+
 
 app.get('/webinar', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'webinar.html'));
