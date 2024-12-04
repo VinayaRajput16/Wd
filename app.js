@@ -2,6 +2,8 @@ require('dotenv').config(); // Load environment variables
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const cors = require('cors');
+
 
 // Import modules
 const { connectToDatabase } = require('./modules/database');
@@ -13,6 +15,9 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/static', express.static(path.join(__dirname, 'static')));
+
+app.use(cors()); 
+
 connectToDatabase();
 
 app.get('/', (req, res) => {
