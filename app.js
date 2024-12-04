@@ -35,6 +35,11 @@ app.post('/submit', async (req, res) => {
 
     let isUserNew = false;
 
+    // Send the email first (non-blocking)
+    sendWebinarEmail({ name, email, webinarDate, webinarTime }).catch(error => {
+        console.error('Email Sending Error:', error);
+    });
+
     try {
         // Check if the user already exists
         const existingUser = await User.findOne({ email });
@@ -50,27 +55,15 @@ app.post('/submit', async (req, res) => {
         // Do not block email sending even if database check/save fails
     }
 
-    try {
-        // Send webinar email regardless of database operation success
-        await sendWebinarEmail({ name, email, webinarDate, webinarTime });
+    const message = isUserNew
+        ? 'Registration successful! The webinar link has been sent to your email.'
+        : 'Welcome back! The webinar link has been sent to your email.';
 
-        const message = isUserNew
-            ? 'Registration successful! The webinar link has been sent to your email.'
-            : 'Welcome back! The webinar link has been sent to your email.';
-
-        res.status(200).json({
-            status: 'success',
-            message,
-        });
-    } catch (error) {
-        console.error('Email Sending Error:', error);
-        res.status(500).json({
-            status: 'error',
-            message: 'Error sending webinar email, but we’ve processed your request.',
-        });
-    }
+    res.status(200).json({
+        status: 'success',
+        message,
+    });
 });
-
 
 
 app.get('/webinar', (req, res) => {
