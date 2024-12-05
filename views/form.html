@@ -17,14 +17,14 @@
         <input type="text" id="name" name="name" required>
 
         <label for="country">Country:</label>
-        <input type="text" id="country" name="country" required>
+        <Input  type="text" id="country" name="country" required></Input>
 
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" required>
 
         <label for="phone">Phone Number:</label>
         <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required>
-        
+
         <button type="submit">Get webinar link</button>
     </form>
 
@@ -37,6 +37,8 @@
     </div>
 
     <script>
+       
+        // Form submission handler
         document.getElementById('registration-form').addEventListener('submit', function (event) {
             event.preventDefault(); // Prevent page reload
 
@@ -93,6 +95,8 @@
             }
         };
     </script>
+
+
 </body>
 
 </html>

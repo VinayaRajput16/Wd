@@ -16,7 +16,6 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/static', express.static(path.join(__dirname, 'static')));
-
 app.use(cors()); 
 
 connectToDatabase();
@@ -29,11 +28,14 @@ app.get('/form', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'form.html'));
 });
 
+
 app.post('/submit', async (req, res) => {
     const { name, country, email, phone } = req.body;
-    const { webinarDate, webinarTime } = getWebinarTimeAndDate();
-
     let isUserNew = false;
+
+    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone; // Get user's timezone from browser
+
+    const { webinarDate, webinarTime } = getWebinarTimeAndDate(userTimeZone);
 
     // Send the email first (non-blocking)
     sendWebinarEmail({ name, email, webinarDate, webinarTime }).catch(error => {
@@ -64,7 +66,6 @@ app.post('/submit', async (req, res) => {
         message,
     });
 });
-
 
 app.get('/webinar', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'webinar.html'));
